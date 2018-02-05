@@ -1,6 +1,6 @@
 {
   "name": "chai-http",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Extend Chai Assertion library with tests for http apis",
   "author": "Jake Luer <jake@alogicalparadox.com>",
   "license": "MIT",
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "cookiejar": "^2.1.1",
-    "is-ip": "^2.0.0",
+    "is-ip": "^1.0.0",
     "methods": "^1.1.2",
     "qs": "^6.5.1",
     "superagent": "^3.7.0"

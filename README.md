@@ -61,24 +61,6 @@ chai.request(app)
   .get('/')
 ```
 
-When passing an `app` to `request`; it will automatically open the server for
-incoming requests (by calling `listen()`) and, once a request has been made
-the server will automatically shut down (by calling `.close()`). If you want to
-keep the server open, perhaps if you're making multiple requests, you must call
-`.keepOpen()` after `.request()`, and manually close the server down:
-
-```js
-var requester = chai.request(app).keepOpen()
-
-Promise.all([
-  requester.get('/a'),
-  requester.get('/b'),
-])
-.then(responses => ....)
-.then(() => requester.close())
-```
-
-
 #### URL
 
 You may also use a base url as the foundation of your request.
@@ -106,11 +88,9 @@ chai.request(app)
 chai.request(app)
   .post('/user/me')
   .type('form')
-  .send({
-    '_method': 'put',
-    'password': '123',
-    'confirmPassword': '123'
-  })
+  .send({'_method': 'put'})
+  .send({'password': '123'})
+  .send({'confirmPassword', '123'})
 ```
 
 ```js
@@ -136,12 +116,6 @@ chai.request(app)
 
 #### Dealing with the response - traditional
 
-In the following examples we use Chai's Expect assertion library:
-
-```js
-var expect = chai.expect;
-```
-
 To make the request and assert on its response, the `end` method can be used:
 
 ```js
@@ -153,9 +127,7 @@ chai.request(app)
      expect(res).to.have.status(200);
   });
 ```
-
 ##### Caveat
-
 Because the `end` function is passed a callback, assertions are run
 asynchronously. Therefore, a mechanism must be used to notify the testing
 framework that the callback has completed. Otherwise, the test will pass before
@@ -174,7 +146,7 @@ it('fails, as expected', function(done) { // <= Pass in done callback
     expect(res).to.have.status(123);
     done();                               // <= Call done to signal callback end
   });
-});
+}) ;
 
 it('succeeds silently!', function() {   // <= No done callback
   chai.request('http://localhost:8080')
@@ -182,7 +154,7 @@ it('succeeds silently!', function() {   // <= No done callback
   .end(function(err, res) {
     expect(res).to.have.status(123);    // <= Test completes before this runs
   });
-});
+}) ;
 ```
 
 When `done` is passed in, Mocha will wait until the call to `done()`, or until
@@ -203,7 +175,7 @@ chai.request(app)
   })
   .catch(function (err) {
      throw err;
-  });
+  })
 ```
 
 __Note:__ Node.js version 0.10.x and some older web browsers do not have
@@ -222,12 +194,13 @@ if (!global.Promise) {
 }
 var chai = require('chai');
 chai.use(require('chai-http'));
+
 ```
 
 #### Retaining cookies with each request
 
 Sometimes you need to keep cookies from one request, and send them with the
-next (for example, when you want to login with the first request, then access an authenticated-only resource later). For this, `.request.agent()` is available:
+next. For this, `.request.agent()` is available:
 
 ```js
 // Log in
@@ -242,11 +215,9 @@ agent
     return agent.get('/user/me')
       .then(function (res) {
          expect(res).to.have.status(200);
-      });
-  });
+      })
+  })
 ```
-
-Note: The server started by `chai.request.agent(app)` will not automatically close following the test(s). You should call `agent.close()` after your tests to ensure your program exits.
 
 ## Assertions
 
@@ -327,7 +298,6 @@ Assert that a `Response` object has a redirect status code.
 
 ```js
 expect(res).to.redirect;
-expect(res).to.not.redirect;
 ```
 
 ### .redirectTo
@@ -359,7 +329,7 @@ expect(req).to.not.have.param('limit');
 * **@param** _{String}_ parameter name
 * **@param** _{String}_ parameter value
 
-Assert that a `Request` or `Response` object has a cookie header with a
+Assert that a `Request`, `Response` or `Agent` object has a cookie header with a
 given key, (optionally) equal to value
 
 ```js
@@ -369,6 +339,9 @@ expect(req).to.not.have.cookie('PHPSESSID');
 expect(res).to.have.cookie('session_id');
 expect(res).to.have.cookie('session_id', '1234');
 expect(res).to.not.have.cookie('PHPSESSID');
+expect(agent).to.have.cookie('session_id');
+expect(agent).to.have.cookie('session_id', '1234');
+expect(agent).to.not.have.cookie('PHPSESSID');
 ```
 
 ## License
